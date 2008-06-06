@@ -1,0 +1,11 @@
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/!svn/ver/579/trunk/vendor/plugins/acts_as_mailchimp/generators/add_mailchimp_fields_migration
+END
+add_mailchimp_fields_migration_generator.rb
+K 25
+svn:wc:ra_dav:version-url
+V 138
+/!svn/ver/579/trunk/vendor/plugins/acts_as_mailchimp/generators/add_mailchimp_fields_migration/add_mailchimp_fields_migration_generator.rb
+END

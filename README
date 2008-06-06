@@ -1,0 +1,114 @@
+ActsAsMailchimp
+===============
+
+This is a simple plugin for interacting with MailChimp. Inspired by the 'acts_as_chimp' plugin by MandarinSoda, this plugin makes it easy to add, remove and update mailing list information. You will need to have a Mail Chimp (http://www.mailchimp.com) account set up, which is free and you will not be charged unless you send emails.
+
+Acts_As_Mailchimp expects a model with the following required fields:
+
+email:string 			= The email address to add/remove from a Mail Chimp mailing list.
+email_type:string = Prefered mail format. Must be either 'html' or 'text'.
+
+Additionally, the plugin allows for the following optional fields:
+
+first_name:string	= The first name of the user to add/remove from Mail Chimp.
+last_name:string	= The last name add/remove from Mail Chimp.
+
+Remember, these fields must be added to your list in Mail Chimp first. The specific column names for all fields can be adjusted in the model, so it is alright if your model has different column names.
+
+
+== Installation
+
+1. Install the plugin: script/plugin install http://svn.terra-firma-design.com/plugins/acts_as_mailchimp
+2. Add your Mail Chimp account username and password into "/config/monkeybrains.yml" for each environment.
+3. Generate a migration (optional): script/generate add_mailchimp_fields_migration
+4. Apply the migration: rake db:migrate
+
+
+== Usage
+
+First, add the plugin methods to your model. For example:
+
+class User < ActiveRecord::Base
+  acts_as_mailchimp
+end
+
+You can make an existing model more chimp-like by simply passing in the correct column names. For example, suppose your model has the email addresses in a column called 'email_address', the email content type in a column called 'email_content_type', and stores the person's name in columns called 'first' and 'last', respectively. To apply acts_as_mailchimp simply pass these field names:
+
+class User < ActiveRecord::Base
+  acts_as_mailchimp :email => 'email_address',
+										:type => 'email_content_type',
+										:fname => 'first',
+										:lname => 'last'
+end
+
+You only need to pass the column names that you need to override. Once added to a model, acts_as_mailchimp adds the methods to model instances (a user model in this example):
+
+@user.add_to_chimp("List Name", false)
+
+- Adds the user to the specified mailing list. The true/false variable determines whether or not to use the double opt-in option at Mail Chimp. If set to 'true', the user will not be added to the mailing list until they click a link in an email that is automatically sent by Mail Chimp. This is called "double opt in". If you already have a double opt-in process in place, you can set it to 'false' in order to immediately add the user to the mailing list. For example, if you require email verification before allowing a user to create an account, then you would probably want to bypass the additional double opt-in feature of Mail Chimp.
+
+@user.remove_from_chimp("List Name")
+
+- Removes a user from the specified mailing list at Mail Chimp.
+
+@user.update_chimp("List Name", previousEmail)
+
+- Updates a user's information at Mail Chimp. The 'previousEmail' value is optional and will default to the value in the 'email' column if left out. However, if the user is attempting to update the email address that they are subscribed to the mailing list with, you will need to provide the previous email address to this method in order to update it. For example, imagine an after_save scenario where the user has just updated their email address. The value that is now in the 'email' column is the new value, so you will want to pass the prior email address (before it was updated) to the method so that it can find the right record at Mail Chimp. In English, or probably some sort of sign language, this is what is being communicated to Mail Chimp:
+
+"Update the record with an email address of <previousEmail> with the new information that is saved in the database."
+
+The use cases for updating Mail Chimp are that a user is either updating their email address, their name or both. 
+
+
+== Examples
+
+Add a user to a list:
+
+@user.add_to_chimp("List Name", false)
+
+To remove a user from a list:
+
+@user.remove_from_chimp("List Name")
+
+To update a list (<Rails 2.1):
+
+@previous = params[:user][:email]
+if @user.update_attributes(params[:user])
+	@user.update_chimp("List Name", @previous) if @user.email != @previous
+end
+
+To update a list (Rails 2.1+):
+
+if @user.update_attributes(params[:user])
+	@user.update_chimp("List Name", @user.email_was) if @user.email_changed?
+end
+
+== Syncing Your Mailing List
+
+If you are using this plugin to have an application deal with signups, you will likely run into a situation where your lists will get out of sync. This is primarily caused (in my experience) because users will always have the option of unsubscribing directly through Mail Chimp, such as if they hit the "unsubscribe" link at the bottom of an email they receive.
+
+There are two options for handling this, depending on your needs:
+
+1. Mail Chimp sends and email notification when users subscribe and unsubscribe to your list. This must be set up for your list, but you could have it go to a dedicated inbox that is periodically checked by your application. You will need to write a Rails method that will access the mailbox, parse the records to determine which email addresses need to be subscribed and unsubscribed, and then do that processing. This method is great for syncing your applications database with the mailing list if there are multiple ways to get on that list, such as through your application and also directly through a web form (directly through Mail Chimp, bypassing your application).
+
+2. A much easier method, and one that allows for immediate changes is that you can customize the forms that Mail Chimp displays to contain a 1x1 pixel transparent image which then calls a method on your rails application, passing any relevant data with it. For example, if users can only subscribe through your application, but you are needing to sync when someone unsubscribes via the link in the email, you can have the "Successful Unsubscribe" template contain an image that sends a request to your application, passing with it the name of the mailing list and the email address to remove.  Here is an example:
+
+-- MAIL CHIMP SUCCESSFUL UNSUBSCRIBE TEMPLATE --
+
+<img src="http://www.<yourapplication>.com/remove?listName=YOURLISTNAME&email=*|EMAIL|*" width="1" height="1" />
+
+This will send a request to your application. The markup *|EMAIL|* will cause Mail Chimp to substitute the email address that just unsubscribed.
+
+-- removeController --
+
+def index
+	@listname = params[:listName]
+	@email = params[:email]
+	@user = User.find_by_email(@email)
+	@user.subscribed_list1 = 0 if @listName == "ListOne"
+	@user.subscribed_list2 = 0 if @listName == "ListTwo"
+	@user.save
+end
+
+Since the email has already been removed in Mail Chimp, this function merely needs to update the @user.subscribed (or whatever you are using) column so that the database is in sync with the Mail Chimp mailing list.
+
