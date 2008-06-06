@@ -1,7 +1,7 @@
 author: Terra Firma Design & Consulting
 summary: Plugin to interact with MailChimp email service.
-homepage: http://svn.terra-firma-design.com/plugins/acts_as_mailchimp
-plugin: http://svn.terra-firma-design/plugins/acts_as_mailchimp
+homepage: http://www.terra-firma-design.com
+plugin: git://github.com/bgetting/acts_as_mailchimp.git
 license: MIT
 version: 0.1a
 rails_version: 2.0.1+
