@@ -18,7 +18,7 @@ Remember, these fields must be added to your list in Mail Chimp first. The speci
 
 == Installation
 
-1. Install the plugin: script/plugin install http://svn.terra-firma-design.com/plugins/acts_as_mailchimp
+1. Install the plugin: script/plugin install git://github.com/bgetting/acts_as_mailchimp.git
 2. Add your Mail Chimp account username and password into "/config/monkeybrains.yml" for each environment.
 3. Generate a migration (optional): script/generate add_mailchimp_fields_migration
 4. Apply the migration: rake db:migrate
