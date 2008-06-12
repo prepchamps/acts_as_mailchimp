@@ -41,6 +41,7 @@ module Terra
           vars.merge!({"FNAME" => self[fname_column]}) if self.has_attribute?(fname_column)
           vars.merge!({"LNAME" => self[lname_column]}) if self.has_attribute?(lname_column)
           mcSubscribe(uid, list_id["id"], self[email_column], vars, self.class.type_column, double_opt)
+        rescue XMLRPC::FaultException
         end
         
         # Remove a user from a MailChimp mailing list
@@ -48,6 +49,7 @@ module Terra
           uid ||= mcLogin(monkeybrains[:username], monkeybrains[:password])
           list_id ||= get_list_by_name(uid, list_name)
           mcUnsubscribe(uid, list_id["id"], self[email_column])
+        rescue XMLRPC::FaultException
         end
         
         # Update user information at MailChimp
