@@ -61,6 +61,7 @@ module Terra
           vars.merge!({"LNAME" => self[lname_column]}) if self.has_attribute?(lname_column)
           vars.merge!({"EMAIL" => self[email_column]})
           mcUpdate(uid, list_id["id"], old_email, vars, self[type_column], true)
+        rescue XMLRPC::FaultException
         end
         
         # Log in to MailChimp
