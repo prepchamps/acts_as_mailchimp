@@ -28,16 +28,13 @@ Remember, these fields must be added to your list in Mail Chimp first. The speci
 First, add the plugin methods to your model. For example:
 
   class User < ActiveRecord::Base
-    acts_as_mailchimp
+  acts_as_mailchimp
   end</tt>
 
 You can make an existing model more chimp-like by simply passing in the correct column names. For example, suppose your model has the email addresses in a column called 'email_address', the email content type in a column called 'email_content_type', and stores the person's name in columns called 'first' and 'last', respectively. To apply acts_as_mailchimp simply pass these field names:
 
   class User < ActiveRecord::Base
-    acts_as_mailchimp :email => 'email_address',
-										  :type => 'email_content_type',
-										  :fname => 'first',
-										  :lname => 'last'
+  acts_as_mailchimp :email => 'email_address', :type => 'email_content_type', :fname => 'first', :lname => 'last'
   end
 
 You only need to pass the column names that you need to override. Once added to a model, acts_as_mailchimp adds the methods to model instances (a user model in this example):
@@ -71,13 +68,13 @@ To update a list (<Rails 2.1):
 
   @previous = params[:user][:email]
   if @user.update_attributes(params[:user])
-	  @user.update_chimp("List Name", @previous) if @user.email != @previous
+	 @user.update_chimp("List Name", @previous) if @user.email != @previous
   end
 
 To update a list (Rails 2.1+):
 
   if @user.update_attributes(params[:user])
-	  @user.update_chimp("List Name", @user.email_was) if @user.email_changed?
+	 @user.update_chimp("List Name", @user.email_was) if @user.email_changed?
   end
 
 == Syncing Your Mailing List
@@ -97,12 +94,12 @@ This will send a request to your application. The markup *|EMAIL|* will cause Ma
 -- removeController --
 
   def index
-	  @listname = params[:listName]
-	  @email = params[:email]
-	  @user = User.find_by_email(@email)
-	  @user.subscribed_list1 = 0 if @listName == "ListOne"
-	  @user.subscribed_list2 = 0 if @listName == "ListTwo"
-	  @user.save
+	@listname = params[:listName]
+	@email = params[:email]
+	@user = User.find_by_email(@email)
+	@user.subscribed_list1 = 0 if @listName == "ListOne"
+	@user.subscribed_list2 = 0 if @listName == "ListTwo"
+	@user.save
   end
 
 Since the email has already been removed in Mail Chimp, this function merely needs to update the @user.subscribed (or whatever you are using) column so that the database is in sync with the Mail Chimp mailing list.
