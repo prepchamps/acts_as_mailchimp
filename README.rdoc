@@ -4,12 +4,12 @@ This is a simple plugin for interacting with MailChimp. Inspired by the 'acts_as
 
 Acts_As_Mailchimp expects a model with the following required fields:
 
-email:string 			= The email address to add/remove from a Mail Chimp mailing list.
+email:string 			= The email address to add/remove from a Mail Chimp mailing list.  
 email_type:string = Prefered mail format. Must be either 'html' or 'text'.
 
 Additionally, the plugin allows for the following optional fields:
 
-first_name:string	= The first name of the user to add/remove from Mail Chimp.
+first_name:string	= The first name of the user to add/remove from Mail Chimp.  
 last_name:string	= The last name add/remove from Mail Chimp.
 
 Remember, these fields must be added to your list in Mail Chimp first. The specific column names for all fields can be adjusted in the model, so it is alright if your model has different column names.
@@ -64,14 +64,14 @@ To remove a user from a list:
 
   @user.remove_from_chimp("List Name")
 
-To update a list (<Rails 2.1):
+To update a list (below Rails 2.1):
 
   @previous = params[:user][:email]
   if @user.update_attributes(params[:user])
 	 @user.update_chimp("List Name", @previous) if @user.email != @previous
   end
 
-To update a list (Rails 2.1+):
+To update a list (Rails 2.1 or above):
 
   if @user.update_attributes(params[:user])
 	 @user.update_chimp("List Name", @user.email_was) if @user.email_changed?
