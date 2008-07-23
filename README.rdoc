@@ -28,28 +28,28 @@ Remember, these fields must be added to your list in Mail Chimp first. The speci
 First, add the plugin methods to your model. For example:
 
   class User < ActiveRecord::Base
-  acts_as_mailchimp
-  end</tt>
+  	acts_as_mailchimp
+  end
 
 You can make an existing model more chimp-like by simply passing in the correct column names. For example, suppose your model has the email addresses in a column called 'email_address', the email content type in a column called 'email_content_type', and stores the person's name in columns called 'first' and 'last', respectively. To apply acts_as_mailchimp simply pass these field names:
 
   class User < ActiveRecord::Base
-  acts_as_mailchimp :email => 'email_address', :type => 'email_content_type', :fname => 'first', :lname => 'last'
+  	acts_as_mailchimp :email => 'email_address', :type => 'email_content_type', :fname => 'first', :lname => 'last'
   end
 
 You only need to pass the column names that you need to override. Once added to a model, acts_as_mailchimp adds the methods to model instances (a user model in this example):
 
   @user.add_to_chimp("List Name", false)
 
-- Adds the user to the specified mailing list. The true/false variable determines whether or not to use the double opt-in option at Mail Chimp. If set to 'true', the user will not be added to the mailing list until they click a link in an email that is automatically sent by Mail Chimp. This is called "double opt in". If you already have a double opt-in process in place, you can set it to 'false' in order to immediately add the user to the mailing list. For example, if you require email verification before allowing a user to create an account, then you would probably want to bypass the additional double opt-in feature of Mail Chimp.
+Adds the user to the specified mailing list. The true/false variable determines whether or not to use the double opt-in option at Mail Chimp. If set to 'true', the user will not be added to the mailing list until they click a link in an email that is automatically sent by Mail Chimp. This is called "double opt in". If you already have a double opt-in process in place, you can set it to 'false' in order to immediately add the user to the mailing list. For example, if you require email verification before allowing a user to create an account, then you would probably want to bypass the additional double opt-in feature of Mail Chimp.
 
-  @user.remove_from_chimp("List Name")
+	@user.remove_from_chimp("List Name")
 
-- Removes a user from the specified mailing list at Mail Chimp.
+Removes a user from the specified mailing list at Mail Chimp.
 
   @user.update_chimp("List Name", previousEmail)
 
-- Updates a user's information at Mail Chimp. The 'previousEmail' value is optional and will default to the value in the 'email' column if left out. However, if the user is attempting to update the email address that they are subscribed to the mailing list with, you will need to provide the previous email address to this method in order to update it. For example, imagine an after_save scenario where the user has just updated their email address. The value that is now in the 'email' column is the new value, so you will want to pass the prior email address (before it was updated) to the method so that it can find the right record at Mail Chimp. In English, or probably some sort of sign language, this is what is being communicated to Mail Chimp:
+Updates a user's information at Mail Chimp. The 'previousEmail' value is optional and will default to the value in the 'email' column if left out. However, if the user is attempting to update the email address that they are subscribed to the mailing list with, you will need to provide the previous email address to this method in order to update it. For example, imagine an after_save scenario where the user has just updated their email address. The value that is now in the 'email' column is the new value, so you will want to pass the prior email address (before it was updated) to the method so that it can find the right record at Mail Chimp. In English, or probably some sort of sign language, this is what is being communicated to Mail Chimp:
 
 <i>"Update the record with an email address of <previousEmail> with the new information that is saved in the database."</i>
 
@@ -87,7 +87,7 @@ There are a couple of options for handling syncing, depending on how your applic
 
 -- MAIL CHIMP SUCCESSFUL UNSUBSCRIBE TEMPLATE --
 
-  <img src="http://www.<yourapplication>.com/remove?listName=YOURLISTNAME&email=*|EMAIL|*" width="1" height="1" /></tt>
+  <img src="http://www.yourdomain.com/remove?listName=YOURLISTNAME&email=*|EMAIL|*" width="1" height="1" /></tt>
 
 This will send a request to your application. The markup *|EMAIL|* will cause Mail Chimp to substitute the email address that just unsubscribed.
 
