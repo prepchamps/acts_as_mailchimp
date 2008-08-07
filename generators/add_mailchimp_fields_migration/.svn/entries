@@ -1,31 +1,0 @@
-8
-
-dir
-638
-https://pec.svn.ey02.engineyard.com/trunk/vendor/plugins/acts_as_mailchimp/generators/add_mailchimp_fields_migration
-https://pec.svn.ey02.engineyard.com
-
-
-
-2008-06-03T03:46:23.974009Z
-579
-brian
-
-
-svn:special svn:externals svn:needs-lock
-
-add_mailchimp_fields_migration_generator.rb
-file
-
-
-
-
-2008-06-02T06:40:37.000000Z
-39e8f9033255e851d01839982c063c36
-2008-06-03T03:46:23.974009Z
-579
-brian
-
-templates
-dir
-
