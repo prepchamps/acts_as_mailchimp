@@ -1,0 +1,163 @@
+h1. "Acts_As_Mailchimp":http://github.com/bgetting/acts_as_mailchimp/tree/master
+
+Inspired by the "acts_as_chimp":http://github.com/matthewjcarlson/acts_as_chimp/tree/master plugin by "Mandarin Soda":http://mandarinsoda.com/, the plugin easily integrates a model with the "Mail Chimp API":http://www.mailchimp.com for email marketing.
+
+***************************************************************************
+
+h2. Issue Tracker
+
+Please submit any bugs, errors or annoyances on our Github wiki at:
+* "http://github.com/bgetting/acts_as_mailchimp/wikis":http://github.com/bgetting/acts_as_mailchimp/wikis
+
+For simple reports, please Github message Brian Getting ("bgetting":http://github.com/bgetting).
+
+
+***************************************************************************
+
+h2. Documentation
+
+This page has documentation on the following:
+* "Installation":#INSTALL
+* "Usage":#USAGE
+* "Examples":#EXAMPLES
+* "Syncing Your Application":#SYNCING
+* "Updates":#UPDATES
+
+***************************************************************************
+
+<a id="INSTALL"/></a>
+h2. Installation
+
+Install the plugin by typing: <code>script/plugin git://github.com/bgetting/acts_as_mailchimp.git</code>
+
+h3. Prerequisites 
+
+You will need to have an account set up at "MailChimp":http://www.mailchimp.com. Setting up an "account at MailChimp":http://www.mailchimp.com/tryit.phtml is free and you will not be charged until you actually send out emails.
+
+"Acts_As_Mailchimp":http://github.com/bgetting/acts_as_mailchimp/tree/master expects a model with the following required fields:
+* <code>email:string</code> - The email address to add/remove from a MailChimp mailing list.
+* <code>email_type:string</code> - Preferred email format. Must be either 'html' or 'text'.
+
+Additionally, the plugin allows for the following options fields, which must be added to your list first in MailChimp:
+* <code>first_name:string</code> - The first name of the user to add/remove from a MailChimp mailing list.
+* <code>last_name:string</code> - The last name of the user to add/remove from a MailChimp mailing list.
+
+h3. After Installation
+
+There are a couple of things that you will need to do after installing the plugin:
+
+* Add your MailChimp username and password for each environment that you want to use into @/config/monkeybrains.yml@.
+* Generate a migration to add the @first_name@ and @last_name@ fields to the 'User' model (*Optional*).
+* Make any adjustments that you want to @/db/migrate/add_mailchimp_fields.rb@ (*Optional*).
+* Migrate your database with @rake db:migrate@.
+
+***************************************************************************
+
+<a id="USAGE"/></a>
+h2. Usage
+
+The following assumes that you have a model named 'User', which has the required @email@ and @email_type@ fields. Please alter to suit if you have a different schema.
+
+* Add @acts_as_mailchimp@ anywhere in your @/models/user.rb@ file.
+
+h3. Customizing
+
+You can customize the fields that the plugin accepts to make an existing model more Chimp-like. Simply pass the fields that you would like to use along with the @acts_as_mailchimp@ call in your 'User' model.
+
+    <pre><code>
+    acts_as_mailchimp :email => 'email_field', :type => 'email_type_field', :fname => 'first_name_field', :lname => 'last_name_field'
+    </pre></code>
+
+You only need to pass in the column names that you want to override.
+
+h3. Methods
+
+Once added to a model, "acts_as_mailchimp":http://github.com/bgetting/acts_as_mailchimp/tree/master adds the following methods to model instances:
+
+* @user.add_to_mailchimp("list_name", use_double_opt_in)@: Add a user to a mailing list at MailChimp called *list_name*. The second variable is a true/false value for whether or not to use MailChimp's built-in double opt-in mechanism. This value defaults to @false@. If set to true, a confirmation email will be generated from MailChimp (and customizable in the MailChimp interface) that will ask the user to verify their desire to be added to the mailing list. They will need to click a verification link in order to be added to the list.
+* @user.remove_from_mailchimp("list_name")@: Removes a user from the specified mailing list at MailChimp.
+* @user.update_mailchimp("list_name", "previous_email_address")@: Updates a user's information at MailChimp. The value for @previous_email_address@ is optional, and will default to the email address in the database for that user. The idea here is that if a user changes their email address in the Rails application, MailChimp will need to old email address in order to look up the user.
+
+***************************************************************************
+
+<a id="EXAMPLES"/></a>
+h2. Examples
+
+The following controller examples illustrate how to use "acts_as_mailchimp":http://github.com/bgetting/acts_as_mailchimp/tree/master:
+
+* To add a user to a mailing list called "weekly_newsletter":
+
+    <pre><code>
+    @user.add_to_mailchimp("weekly_newsletter", false)
+    </pre></code>
+
+* To remove a user from a mailing list called "weekly_newsletter":
+
+    <pre><code>
+    @user.remove_from_mailchimp("weekly_newsletter")
+    </pre></code>
+
+* To update information about a user *Rails 2.1 or below*:
+
+    <pre><code>
+    previous = params[:user][:email]
+		if @user.update_attributes(params[:user])
+		  @user.update_mailchimp("weekly_newsletter", previous) if @user.email != previous
+		end
+    </pre></code>
+
+* To update information about a user *Rails 2.1 or above*:
+
+    <pre><code>
+		if @user.update_attributes(params[:user])
+		  @user.update_mailchimp("weekly_newsletter", @user.email_was) if @user.email_changed?
+		end
+    </pre></code>
+
+Keep in mind that you these update examples do not make calls to the MailChimp API unless the user changes their email address. If you are integrating @first_name@ and @last_name@ fields as well, you will need to adjust your controller code to update MailChimp when they change either of these values as well.
+
+***************************************************************************
+
+<a id="SYNCING"/></a>
+h2. Syncing Your Rails Application
+
+One of the issues with integrating a Rails application with MailChimp is keeping the mailing list at MailChimp in sync with the information in the database of your Rails application. Depending on how your Rails application works, there are a couple of options for making sure that the two systems are synced up:
+
+**1.** MailChimp sends out an email notification when users subscribe and unsubscribe to your list. You must set this up for each list in your MailChimp interface. One option is to have this email delivered to a dedicated inbox that is periodically checked by your Rails application, such as in a background process. The Rails application would then need to open up each email, determine which email addresses need to be removed or added, and then make the required changes in the database. The only reason to resort to this method is if there are multiple ways to sign up for a mailing list, where the person may not be going through the Rails application to get on the MailChimp mailing list.
+
+**2.** A much easier method, and one that allows for immediate changes to your Rails application database, is to use a transparent GIF image on your "successful unsubscribe" page in the MailChimp interface. This method assumes that the only way someone can get signed up for your mailing list is through your Rails application. Since they can unsubscribe directly through MailChimp still, this technique simply notifies the Rails application when someone unsubscribes from outside the Rails application. Here is an example:
+
+**MAILCHIMP SUCCESSFUL UNSUBSCRIBE TEMPLATE**
+
+    <pre><code>
+    <img src="http://www.yourdomain.com/remove?listName=YOUR_LIST_NAME&amp;email=*|EMAIL|*" width="1" height="1" />
+    </pre></code>
+
+This will send a request to your application. The markup @|EMAIL|@ will cause Mail Chimp to substitute the email address that just unsubscribed.
+
+**REMOVE CONTROLLER**
+
+    <pre><code>
+    def index
+      @listname = params[:listName]
+      @email = params[:email]
+      @user = User.find_by_email(@email)
+      @user.subscribed_weekly = 0 if @listName = "weekly_newsletter"
+			@user.subscribed_monthly = 0 if @listName = "monthly_newsletter"
+      @user.save
+    end
+    </pre></code>
+
+Since the email address has already been removed from the list in Mail Chimp, this function merely needs to update the User instance for that email address, letting the Rails application know that the user has unsubscribed directly through MailChimp.
+
+***************************************************************************
+
+<a id="UPDATES"/></a>
+h2. Updates
+
+MailChimp updated their API from @Version 1.0@ to @Version 1.1@ in August 2008. We are continuing to update "acts_as_mailchimp":http://github.com/bgetting/acts_as_mailchimp/tree/master in order to keep it current, and have issued the following changes as of September 2008:
+
+* API calls are now being made to @Version 1.1@ of the MailChimp API.
+* @add_to_chimp@ changed to @add_to_mailchimp@.
+* @remove_from_chimp@ changed to @remove_from_mailchimp@.
+* @update_chimp_@ changed to @update_mailchimp@.
