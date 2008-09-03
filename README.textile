@@ -19,7 +19,7 @@ This page has documentation on the following:
 * "Syncing Your Application":#SYNCING
 * "Updates":#UPDATES
 
-<a id="INSTALL"/></a>
+<a id="INSTALL"></a>
 h2. Installation
 
 Install the plugin by typing: <code>script/plugin git://github.com/bgetting/acts_as_mailchimp.git</code>
@@ -45,7 +45,7 @@ There are a couple of things that you will need to do after installing the plugi
 * Make any adjustments that you want to @/db/migrate/add_mailchimp_fields.rb@ (*Optional*).
 * Migrate your database with @rake db:migrate@.
 
-<a id="USAGE"/></a>
+<a id="USAGE"></a>
 h2. Usage
 
 The following assumes that you have a model named 'User', which has the required @email@ and @email_type@ fields. Please alter to suit if you have a different schema.
@@ -70,10 +70,12 @@ h3. Methods
 Once added to a model, "acts_as_mailchimp":http://github.com/bgetting/acts_as_mailchimp/tree/master adds the following methods to model instances:
 
 * @user.add_to_mailchimp("list_name", use_double_opt_in)@: Add a user to a mailing list at MailChimp called *list_name*. The second variable is a true/false value for whether or not to use MailChimp's built-in double opt-in mechanism. This value defaults to @false@. If set to true, a confirmation email will be generated from MailChimp (and customizable in the MailChimp interface) that will ask the user to verify their desire to be added to the mailing list. They will need to click a verification link in order to be added to the list.
+
 * @user.remove_from_mailchimp("list_name")@: Removes a user from the specified mailing list at MailChimp.
+
 * @user.update_mailchimp("list_name", "previous_email_address")@: Updates a user's information at MailChimp. The value for @previous_email_address@ is optional, and will default to the email address in the database for that user. The idea here is that if a user changes their email address in the Rails application, MailChimp will need to old email address in order to look up the user.
 
-<a id="EXAMPLES"/></a>
+<a id="EXAMPLES"></a>
 h2. Examples
 
 The following controller examples illustrate how to use "acts_as_mailchimp":http://github.com/bgetting/acts_as_mailchimp/tree/master:
@@ -109,7 +111,7 @@ The following controller examples illustrate how to use "acts_as_mailchimp":http
 
 Keep in mind that you these update examples do not make calls to the MailChimp API unless the user changes their email address. If you are integrating @first_name@ and @last_name@ fields as well, you will need to adjust your controller code to update MailChimp when they change either of these values as well.
 
-<a id="SYNCING"/></a>
+<a id="SYNCING"></a>
 h2. Syncing Your Rails Application
 
 One of the issues with integrating a Rails application with MailChimp is keeping the mailing list at MailChimp in sync with the information in the database of your Rails application. Depending on how your Rails application works, there are a couple of options for making sure that the two systems are synced up:
@@ -141,7 +143,7 @@ This will send a request to your application. The markup @|EMAIL|@ will cause Ma
 
 Since the email address has already been removed from the list in Mail Chimp, this function merely needs to update the User instance for that email address, letting the Rails application know that the user has unsubscribed directly through MailChimp.
 
-<a id="UPDATES"/></a>
+<a id="UPDATES"></a>
 h2. Updates
 
 MailChimp updated their API from @Version 1.0@ to @Version 1.1@ in August 2008. We are continuing to update "acts_as_mailchimp":http://github.com/bgetting/acts_as_mailchimp/tree/master in order to keep it current, and have issued the following changes as of September 2008:
