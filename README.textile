@@ -2,7 +2,6 @@ h1. "Acts_As_Mailchimp":http://github.com/bgetting/acts_as_mailchimp/tree/master
 
 Inspired by the "acts_as_chimp":http://github.com/matthewjcarlson/acts_as_chimp/tree/master plugin by "Mandarin Soda":http://mandarinsoda.com/, the plugin easily integrates a model with the "Mail Chimp API":http://www.mailchimp.com for email marketing.
 
-***************************************************************************
 
 h2. Issue Tracker
 
@@ -10,9 +9,6 @@ Please submit any bugs, errors or annoyances on our Github wiki at:
 * "http://github.com/bgetting/acts_as_mailchimp/wikis":http://github.com/bgetting/acts_as_mailchimp/wikis
 
 For simple reports, please Github message Brian Getting ("bgetting":http://github.com/bgetting).
-
-
-***************************************************************************
 
 h2. Documentation
 
@@ -22,8 +18,6 @@ This page has documentation on the following:
 * "Examples":#EXAMPLES
 * "Syncing Your Application":#SYNCING
 * "Updates":#UPDATES
-
-***************************************************************************
 
 <a id="INSTALL"/></a>
 h2. Installation
@@ -51,8 +45,6 @@ There are a couple of things that you will need to do after installing the plugi
 * Make any adjustments that you want to @/db/migrate/add_mailchimp_fields.rb@ (*Optional*).
 * Migrate your database with @rake db:migrate@.
 
-***************************************************************************
-
 <a id="USAGE"/></a>
 h2. Usage
 
@@ -65,7 +57,10 @@ h3. Customizing
 You can customize the fields that the plugin accepts to make an existing model more Chimp-like. Simply pass the fields that you would like to use along with the @acts_as_mailchimp@ call in your 'User' model.
 
     <pre><code>
-    acts_as_mailchimp :email => 'email_field', :type => 'email_type_field', :fname => 'first_name_field', :lname => 'last_name_field'
+    acts_as_mailchimp :email => 'email_field',
+                      :type => 'email_type_field',
+                      :fname => 'first_name_field',
+                      :lname => 'last_name_field'
     </pre></code>
 
 You only need to pass in the column names that you want to override.
@@ -77,8 +72,6 @@ Once added to a model, "acts_as_mailchimp":http://github.com/bgetting/acts_as_ma
 * @user.add_to_mailchimp("list_name", use_double_opt_in)@: Add a user to a mailing list at MailChimp called *list_name*. The second variable is a true/false value for whether or not to use MailChimp's built-in double opt-in mechanism. This value defaults to @false@. If set to true, a confirmation email will be generated from MailChimp (and customizable in the MailChimp interface) that will ask the user to verify their desire to be added to the mailing list. They will need to click a verification link in order to be added to the list.
 * @user.remove_from_mailchimp("list_name")@: Removes a user from the specified mailing list at MailChimp.
 * @user.update_mailchimp("list_name", "previous_email_address")@: Updates a user's information at MailChimp. The value for @previous_email_address@ is optional, and will default to the email address in the database for that user. The idea here is that if a user changes their email address in the Rails application, MailChimp will need to old email address in order to look up the user.
-
-***************************************************************************
 
 <a id="EXAMPLES"/></a>
 h2. Examples
@@ -116,8 +109,6 @@ The following controller examples illustrate how to use "acts_as_mailchimp":http
 
 Keep in mind that you these update examples do not make calls to the MailChimp API unless the user changes their email address. If you are integrating @first_name@ and @last_name@ fields as well, you will need to adjust your controller code to update MailChimp when they change either of these values as well.
 
-***************************************************************************
-
 <a id="SYNCING"/></a>
 h2. Syncing Your Rails Application
 
@@ -149,8 +140,6 @@ This will send a request to your application. The markup @|EMAIL|@ will cause Ma
     </pre></code>
 
 Since the email address has already been removed from the list in Mail Chimp, this function merely needs to update the User instance for that email address, letting the Rails application know that the user has unsubscribed directly through MailChimp.
-
-***************************************************************************
 
 <a id="UPDATES"/></a>
 h2. Updates
