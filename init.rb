@@ -1,1 +1,2 @@
-require File.dirname(__FILE__) + "/rails/init"
+require 'acts_as_mailchimp'
+ActiveRecord::Base.send(:include, Terra::Acts::MailChimp)
