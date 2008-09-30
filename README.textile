@@ -24,13 +24,7 @@ h2. Installation
 
 Install as a plugin by typing: <code>script/plugin git://github.com/bgetting/acts_as_mailchimp.git</code>
 
-Install as a GemPlugin using gem dependencies:
-
-    <pre><code>
-			config.gem "acts_as_mailchimp",
-								 :source => git://github.com/bgetting/acts_as_mailchimp.git,
-								 :version => "~>0.1.2"
-		</code></pre>
+Install as a GemPlugin using gem dependencies: <code>config.gem "acts_as_mailchimp", :source => git://github.com/bgetting/acts_as_mailchimp.git, :version => "~>0.1.2"</code>
 
 h3. Prerequisites 
 
